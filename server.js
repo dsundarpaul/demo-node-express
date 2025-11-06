@@ -11,18 +11,20 @@ app.use(bodyParser.json());
 
 const MOCK_USERS = [
   {
-    name: 'john',
-    password: '123',
+    id: 1,
+    name: "john",
+    password: "123",
     age: 20,
-    phone: '1234567890'
+    phone: "1234567890",
   },
   {
-    name: 'doe john',
-    password: '123456',
+    id: 2,
+    name: "doe john",
+    password: "123456",
     age: 21,
-    phone: '1234567890'
-  }
-]
+    phone: "1234567890",
+  },
+];
 
 const authenticateUser = (req, res, next) => {
   const newAuth = req.headers.authorization.split(' ')[1]
