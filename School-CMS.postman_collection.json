@@ -1,0 +1,344 @@
+{
+  "info": {
+    "name": "School CMS API",
+    "description": "Node.js demonstrations: FS, Streaming, File Handling, Event Emitting",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. File System Operations",
+      "item": [
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Emma Watson\",\n  \"grade\": \"10th\",\n  \"age\": 16,\n  \"parentContact\": \"+1-555-0123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/students",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/students",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Student",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/students/1",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "students", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grade\": \"11th\",\n  \"age\": 17\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/students/1",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "students", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:3000/api/students/1",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "students", "1"]
+            }
+          }
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"School Holiday Notice\",\n  \"content\": \"School will be closed on Monday for maintenance\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/announcements",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "announcements"]
+            }
+          }
+        },
+        {
+          "name": "Get All Announcements",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/announcements",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "announcements"]
+            }
+          }
+        },
+        {
+          "name": "Add Grade",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 1,\n  \"subject\": \"Mathematics\",\n  \"grade\": \"A\",\n  \"semester\": \"Fall 2024\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/grades",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "grades"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Grades",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/grades/1",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "grades", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Data Streaming",
+      "item": [
+        {
+          "name": "Stream Student Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/stream/report/1",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stream", "report", "1"]
+            }
+          }
+        },
+        {
+          "name": "Stream Large File",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/stream/large-file",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "stream", "large-file"]
+            }
+          }
+        },
+        {
+          "name": "Stream Activity Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/logs/activity",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "logs", "activity"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. File Handling",
+      "item": [
+        {
+          "name": "Upload Student Photo",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "studentId",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/upload/student-photo",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "upload", "student-photo"]
+            }
+          }
+        },
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "documentType",
+                  "value": "transcript",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/upload/document",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "upload", "document"]
+            }
+          }
+        },
+        {
+          "name": "List All Uploads",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/uploads/list",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "uploads", "list"]
+            }
+          }
+        },
+        {
+          "name": "Download File",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/download/:filename",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "download", ":filename"],
+              "variable": [
+                {
+                  "key": "filename",
+                  "value": "your-file-name-here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Event Emitting",
+      "item": [
+        {
+          "name": "Listen to Events (SSE)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/events/listen",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "events", "listen"]
+            }
+          }
+        },
+        {
+          "name": "Trigger Custom Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventType\": \"customEvent\",\n  \"data\": {\n    \"message\": \"Test event triggered\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/events/trigger",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "events", "trigger"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Root - API Info",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": [""]
+        }
+      }
+    }
+  ]
+}
+

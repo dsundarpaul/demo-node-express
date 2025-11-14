@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School CMS - Event Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .status.connected {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status.disconnected {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn.disconnect {
+            background: #ef4444;
+        }
+        
+        .btn.disconnect:hover {
+            background: #dc2626;
+        }
+        
+        .events-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .event {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .event-type {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        
+        .event-data {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .event-time {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .event.studentAdded {
+            border-left-color: #10b981;
+        }
+        
+        .event.gradeUpdated {
+            border-left-color: #f59e0b;
+        }
+        
+        .event.announcementCreated {
+            border-left-color: #3b82f6;
+        }
+        
+        .event.fileUploaded {
+            border-left-color: #8b5cf6;
+        }
+        
+        .event-type.studentAdded {
+            color: #10b981;
+        }
+        
+        .event-type.gradeUpdated {
+            color: #f59e0b;
+        }
+        
+        .event-type.announcementCreated {
+            color: #3b82f6;
+        }
+        
+        .event-type.fileUploaded {
+            color: #8b5cf6;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏫 School CMS Event Monitor</h1>
+            <p style="color: #6b7280; margin-top: 10px;">Real-time event streaming using Server-Sent Events (SSE)</p>
+            <div style="margin-top: 15px;">
+                <span id="status" class="status disconnected">Disconnected</span>
+                <span style="color: #9ca3af; margin-left: 10px;" id="eventCount">0 events received</span>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="connectBtn" onclick="connectToEvents()">Connect to Events</button>
+            <button class="btn disconnect" id="disconnectBtn" onclick="disconnectFromEvents()" disabled>Disconnect</button>
+            <button class="btn" onclick="clearEvents()">Clear Events</button>
+        </div>
+        
+        <div class="events-container">
+            <div id="eventsLog">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <h3>No events yet</h3>
+                    <p>Click "Connect to Events" and start performing actions in the CMS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let eventCount = 0;
+        
+        function connectToEvents() {
+            if (eventSource) {
+                return;
+            }
+            
+            eventSource = new EventSource('http://localhost:3000/api/events/listen');
+            
+            eventSource.onopen = () => {
+                updateStatus(true);
+                addSystemEvent('Connected to event stream');
+            };
+            
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    addEvent(data.event, data.data);
+                } catch (e) {
+                    console.log('Connection message:', event.data);
+                }
+            };
+            
+            eventSource.onerror = (error) => {
+                console.error('EventSource error:', error);
+                updateStatus(false);
+                addSystemEvent('Connection error - attempting to reconnect...');
+            };
+        }
+        
+        function disconnectFromEvents() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                updateStatus(false);
+                addSystemEvent('Disconnected from event stream');
+            }
+        }
+        
+        function updateStatus(connected) {
+            const statusEl = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            
+            if (connected) {
+                statusEl.className = 'status connected';
+                statusEl.textContent = 'Connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                statusEl.className = 'status disconnected';
+                statusEl.textContent = 'Disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+        
+        function addEvent(eventType, eventData) {
+            eventCount++;
+            document.getElementById('eventCount').textContent = `${eventCount} events received`;
+            
+            const eventsLog = document.getElementById('eventsLog');
+            const emptyState = eventsLog.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            const eventEl = document.createElement('div');
+            eventEl.className = `event ${eventType}`;
+            
+            const eventTypeEl = document.createElement('div');
+            eventTypeEl.className = `event-type ${eventType}`;
+            eventTypeEl.textContent = eventType;
+            
+            const eventDataEl = document.createElement('div');
+            eventDataEl.className = 'event-data';
+            
+            const formattedData = formatEventData(eventType, eventData);
+            eventDataEl.innerHTML = formattedData;
+            
+            const eventTimeEl = document.createElement('div');
+            eventTimeEl.className = 'event-time';
+            eventTimeEl.textContent = new Date().toLocaleTimeString();
+            
+            eventEl.appendChild(eventTypeEl);
+            eventEl.appendChild(eventDataEl);
+            eventEl.appendChild(eventTimeEl);
+            
+            eventsLog.insertBefore(eventEl, eventsLog.firstChild);
+        }
+        
+        function formatEventData(eventType, data) {
+            switch(eventType) {
+                case 'studentAdded':
+                    return `
+                        <strong>Student:</strong> ${data.name}<br>
+                        <strong>ID:</strong> ${data.id}<br>
+                        <strong>Grade:</strong> ${data.grade}<br>
+                        <strong>Age:</strong> ${data.age}<br>
+                        <strong>Parent Contact:</strong> ${data.parentContact}
+                    `;
+                case 'gradeUpdated':
+                    return `
+                        <strong>Student ID:</strong> ${data.studentId}<br>
+                        <strong>Subject:</strong> ${data.subject}<br>
+                        <strong>Grade:</strong> ${data.grade}<br>
+                        <strong>Semester:</strong> ${data.semester}
+                    `;
+                case 'announcementCreated':
+                    return `
+                        <strong>Title:</strong> ${data.title}<br>
+                        <strong>Priority:</strong> ${data.priority}<br>
+                        <strong>Content:</strong> ${data.content}
+                    `;
+                case 'fileUploaded':
+                    return `
+                        <strong>File:</strong> ${data.originalName || data.filename}<br>
+                        <strong>Size:</strong> ${formatBytes(data.size)}<br>
+                        <strong>Uploaded by:</strong> ${data.uploadedBy}
+                    `;
+                default:
+                    return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        function addSystemEvent(message) {
+            const eventsLog = document.getElementById('eventsLog');
+            const emptyState = eventsLog.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            const eventEl = document.createElement('div');
+            eventEl.className = 'event';
+            eventEl.style.borderLeftColor = '#6b7280';
+            
+            const eventTypeEl = document.createElement('div');
+            eventTypeEl.className = 'event-type';
+            eventTypeEl.style.color = '#6b7280';
+            eventTypeEl.textContent = 'SYSTEM';
+            
+            const eventDataEl = document.createElement('div');
+            eventDataEl.className = 'event-data';
+            eventDataEl.textContent = message;
+            
+            const eventTimeEl = document.createElement('div');
+            eventTimeEl.className = 'event-time';
+            eventTimeEl.textContent = new Date().toLocaleTimeString();
+            
+            eventEl.appendChild(eventTypeEl);
+            eventEl.appendChild(eventDataEl);
+            eventEl.appendChild(eventTimeEl);
+            
+            eventsLog.insertBefore(eventEl, eventsLog.firstChild);
+        }
+        
+        function clearEvents() {
+            const eventsLog = document.getElementById('eventsLog');
+            eventsLog.innerHTML = `
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <h3>No events yet</h3>
+                    <p>Click "Connect to Events" and start performing actions in the CMS</p>
+                </div>
+            `;
+            eventCount = 0;
+            document.getElementById('eventCount').textContent = '0 events received';
+        }
+        
+        window.addEventListener('beforeunload', () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>
+
